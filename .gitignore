@@ -17,3 +17,6 @@ npm-debug.log*
 .gstack/
 .claude/
 .claude/settings.local.json
+
+# Design records: kept local only, not published
+docs/
