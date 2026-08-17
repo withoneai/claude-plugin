@@ -13,7 +13,7 @@
       "source": "./",
       "description": "Connect Claude Code to 500+ apps (Gmail, Slack, Stripe, Shopify, HubSpot, Notion, Linear, Salesforce, QuickBooks, and more) through One's remote MCP server. OAuth sign-in, nothing to install.",
       "category": "integrations",
-      "homepage": "https://www.withone.ai/docs/mcp",
+      "homepage": "https://www.withone.ai",
       "tags": [
         "mcp",
         "integrations",

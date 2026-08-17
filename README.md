@@ -2,10 +2,12 @@
 
 Connect Claude Code to **500+ apps** (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear,
 Salesforce, QuickBooks, Google Calendar, and more) through [One](https://www.withone.ai)'s
-remote MCP server.
+[remote MCP server](https://www.withone.ai/products/mcp).
 
 Four tools. Real API documentation for 80,000+ actions. OAuth sign-in in your browser. Nothing to
 install and no API keys to manage: One handles every platform's auth server-side.
+
+Learn more about the server this plugin connects to: **https://www.withone.ai/products/mcp**
 
 ```text
 Discover -> Search -> Read the docs -> Execute
@@ -114,6 +116,7 @@ your browser. Nothing runs locally.
 ## Links
 
 - One: https://www.withone.ai
+- One's remote MCP server: https://www.withone.ai/products/mcp
 - MCP docs: https://www.withone.ai/docs/mcp
 - Dashboard: https://app.withone.ai
 - This plugin: https://github.com/withoneai/claude-plugin
