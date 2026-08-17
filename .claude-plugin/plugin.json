@@ -3,14 +3,14 @@
   "name": "one",
   "displayName": "One",
   "version": "1.0.0",
-  "description": "Connect Claude Code to 500+ apps (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear, Salesforce, QuickBooks, and more) through One's remote MCP server. Four tools, real API documentation for 80,000+ actions, OAuth sign-in — nothing to install and no API keys to manage.",
+  "description": "Connect Claude Code to 500+ apps (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear, Salesforce, QuickBooks, and more) through One's remote MCP server. Four tools, real API documentation for 80,000+ actions, OAuth sign-in. Nothing to install and no API keys to manage.",
   "author": {
     "name": "One Systems, Inc.",
     "email": "support@withone.ai",
     "url": "https://www.withone.ai"
   },
   "homepage": "https://www.withone.ai/docs/mcp",
-  "repository": "https://github.com/withoneai/one-claude-plugin",
+  "repository": "https://github.com/withoneai/claude-plugin",
   "license": "MIT",
   "keywords": [
     "integrations",

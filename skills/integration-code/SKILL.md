@@ -1,8 +1,8 @@
 ---
 name: integration-code
 description: >-
-  Write integration code against a third-party API — Gmail, Stripe, Shopify, HubSpot, QuickBooks,
-  Slack, Salesforce, Notion, Linear and 500+ more — using the API's real schema from One instead of
+  Write integration code against a third-party API (Gmail, Stripe, Shopify, HubSpot, QuickBooks,
+  Slack, Salesforce, Notion, Linear and 500+ more) using the API's real schema from One instead of
   a guessed one. Use when building a feature that calls an external SaaS API, generating a client,
   route handler, or webhook handler, adding a connection to an app, or debugging an integration
   that returns 400/401/422. Uses One's read tools (search + knowledge) and then writes code; does
@@ -18,16 +18,16 @@ allowed-tools:
 
 Integration code fails on details a model can't recall: the exact field name, whether a value
 goes in the body or the query string, which enum the API accepts *this year*. One's action
-knowledge carries all of it — so look the API up rather than writing from memory.
+knowledge carries all of it, so look the API up rather than writing from memory.
 
 This is what One's **knowledge-only mode** is for: on the consent screen the user can drop
 `execute_one_action`, so you can read every API's real schema while coding and can't fire a
-live request at production data by accident. The workflow below is the same either way — you
+live request at production data by accident. The workflow below is the same either way. You
 just never call execute when the deliverable is code.
 
 ## Before you write the call
 
-1. `list_one_integrations` — confirm the platform slug (and, if you're going to run through One,
+1. `list_one_integrations`: confirm the platform slug (and, if you're going to run through One,
    grab the connection `key`).
 2. `search_one_platform_actions` on that `platform`, `query` described by outcome ("create a
    customer", "list orders since a date"). Pass `agent_type: "knowledge"` if you want to bias
@@ -41,7 +41,7 @@ just never call execute when the deliverable is code.
 If you write a request body with a field the knowledge doesn't list, you invented it. Go back
 and check.
 
-## Two ways to ship the call — pick one and say which
+## Two ways to ship the call: pick one and say which
 
 **Through One (Passthrough API).** Keep One in the runtime. The user's One connection handles
 the platform's auth, so your code holds no per-platform tokens and no refresh logic. In
@@ -49,7 +49,7 @@ knowledge-only mode the knowledge response ends with an *Integration Code Guide*
 this out: `POST/GET https://api.withone.ai/v1/passthrough<action path>` with headers
 `x-one-secret` (from `ONE_SECRET`), `x-one-connection-key` (from an env var like
 `ONE_GMAIL_CONNECTION_KEY`), and `x-one-action-id` (the action's id). Follow that guide
-verbatim — path variables into the URL, query params into the query string, body fields into
+verbatim: path variables into the URL, query params into the query string, body fields into
 JSON. Good when the app already uses One or integrates several platforms.
 
 **Direct to the platform.** Use the knowledge purely as documentation and write a normal HTTP
@@ -70,9 +70,9 @@ nullable field, represent that rather than asserting the happy path.
 Never write a key, token, or secret into source, a config file, a test fixture, or a committed
 `.env`. Read from the environment and add the variable name to `.env.example` so the next
 person knows what to set. If the code is a client-side component, the call goes through a
-server route — a browser bundle can't hold a platform credential or a One secret. When you
+server route. A browser bundle can't hold a platform credential or a One secret. When you
 deliver the code, tell the user explicitly which env vars to set and where (Vercel/Netlify env,
-Supabase secrets, etc.).
+Supabase secrets, and so on).
 
 ## Pagination and rate limits are not optional
 
@@ -103,7 +103,7 @@ auth is failing, check the scope granted on the connection before touching the c
 ## Don't execute
 
 The deliverable here is source code. Even if `execute_one_action` is available, don't call it
-to "test" — the user's connections point at real accounts. If they want a live smoke test, ask
+to "test": the user's connections point at real accounts. If they want a live smoke test, ask
 first and use the `integrations` skill's confirm-before-write discipline.
 
 Full docs: https://www.withone.ai/docs/mcp
