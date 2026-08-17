@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "one",
-  "description": "Official One plugin: connect Claude Code to 500+ apps through One's remote MCP server.",
+  "description": "Official One plugin: connect Claude Code and Claude Cowork to 500+ apps through One's remote MCP server.",
   "owner": {
     "name": "One Systems, Inc.",
     "email": "support@withone.ai",
@@ -11,7 +11,7 @@
     {
       "name": "one",
       "source": "./",
-      "description": "Connect Claude Code to 500+ apps (Gmail, Slack, Stripe, Shopify, HubSpot, Notion, Linear, Salesforce, QuickBooks, and more) through One's remote MCP server. OAuth sign-in, nothing to install.",
+      "description": "Connect Claude Code and Claude Cowork to 500+ apps (Gmail, Slack, Stripe, Shopify, HubSpot, Notion, Linear, Salesforce, QuickBooks, and more) through One's remote MCP server. OAuth sign-in, nothing to install.",
       "category": "integrations",
       "homepage": "https://www.withone.ai",
       "tags": [

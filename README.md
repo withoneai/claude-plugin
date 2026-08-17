@@ -1,6 +1,6 @@
-# One for Claude Code
+# One for Claude Code and Cowork
 
-Connect Claude Code to **500+ apps** (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear,
+Connect Claude Code and Claude Cowork to **500+ apps** (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear,
 Salesforce, QuickBooks, Google Calendar, and more) through [One](https://www.withone.ai)'s
 [remote MCP server](https://www.withone.ai/products/mcp).
 
@@ -24,7 +24,7 @@ list_one_integrations -> search_one_platform_actions -> get_one_action_knowledge
 
 ## Install
 
-In Claude Code:
+### Claude Code
 
 ```text
 /plugin marketplace add withoneai/claude-plugin
@@ -46,6 +46,13 @@ whether to enable knowledge-only mode. That's it. Tokens are stored securely and
 automatically.
 
 Or from your shell: `claude mcp login plugin:one:one`.
+
+### Claude Cowork
+
+In the Claude desktop app, open **Customize**, then **Plugins**, choose **Add marketplace**, and
+enter `withoneai/claude-plugin`. Install **One** from that marketplace. When prompted, sign in to
+One in your browser and scope access on the consent screen. The plugin registers the One connector
+and both skills for you; the skills appear under the **+** menu, Plugins, One.
 
 ### Prerequisites
 

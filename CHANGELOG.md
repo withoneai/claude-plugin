@@ -8,7 +8,7 @@ All notable changes to the One plugin are documented here. This project follows
 ### Added
 
 - Initial release.
-- Connects Claude Code to One's remote MCP server (`https://mcp.withone.ai/mcp`) over
+- Connects Claude Code and Claude Cowork to One's remote MCP server (`https://mcp.withone.ai/mcp`) over
   Streamable HTTP with OAuth 2.1 sign-in (dynamic client registration + PKCE). Nothing to
   install locally and no API keys to manage.
 - Four tools: `list_one_integrations`, `search_one_platform_actions`,
