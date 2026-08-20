@@ -1,6 +1,6 @@
 # One for Claude Code and Cowork
 
-Connect Claude Code and Claude Cowork to **500+ apps** (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear,
+Connect Claude Code and Claude Cowork to **700+ apps** (Gmail, Slack, Shopify, HubSpot, Stripe, Notion, Linear,
 Salesforce, QuickBooks, Google Calendar, and more) through [One](https://www.withone.ai)'s
 [remote MCP server](https://www.withone.ai/products/mcp).
 
