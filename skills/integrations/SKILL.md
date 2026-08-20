@@ -2,7 +2,7 @@
 name: integrations
 description: >-
   Read and write real data in third-party apps (Gmail, Slack, Stripe, Shopify, HubSpot,
-  QuickBooks, Linear, Notion, Salesforce, Google Calendar and 500+ more) through the One MCP
+  QuickBooks, Linear, Notion, Salesforce, Google Calendar and 700+ more) through the One MCP
   server. Use whenever the user wants to send an email, post a message, look up a customer, pull
   invoices, create or update a record (order, contact, task, issue, deal), or take ANY action in an
   external or connected SaaS app, even if they never say "One". Workflow: list_one_integrations,

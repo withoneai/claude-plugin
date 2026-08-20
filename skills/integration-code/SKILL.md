@@ -2,7 +2,7 @@
 name: integration-code
 description: >-
   Write integration code against a third-party API (Gmail, Stripe, Shopify, HubSpot, QuickBooks,
-  Slack, Salesforce, Notion, Linear and 500+ more) using the API's real schema from One instead of
+  Slack, Salesforce, Notion, Linear and 700+ more) using the API's real schema from One instead of
   a guessed one. Use when building a feature that calls an external SaaS API, generating a client,
   route handler, or webhook handler, adding a connection to an app, or debugging an integration
   that returns 400/401/422. Uses One's read tools (search + knowledge) and then writes code; does
