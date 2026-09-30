@@ -3,6 +3,20 @@
 All notable changes to the One plugin are documented here. This project follows
 [Semantic Versioning](https://semver.org).
 
+## [1.1.0] - 2026-09-30
+
+### Changed
+
+- The server now finds actions with one tool: `find_one_actions` replaces
+  `search_one_platform_actions` and `get_one_action_knowledge`. It finds the action for every
+  operation a task needs, across platforms, with its documentation, in one call; `load` fetches
+  more of a document or an alternative's.
+- `integrations` skill: the loop is now list, find, execute, with how to phrase `intent` (the
+  operation alone) and `task` (the job in general terms), how to read a find answer (the pick,
+  actions also chosen, a substitute to use instead, alternatives), and `load` for more.
+- `integration-code` skill: looks every API a feature touches up in one find call, and loads the
+  whole document before generating types from a digest.
+
 ## [1.0.1] - 2026-08-20
 
 ### Changed

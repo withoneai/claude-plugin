@@ -5,20 +5,19 @@ description: >-
   Slack, Salesforce, Notion, Linear and 700+ more) using the API's real schema from One instead of
   a guessed one. Use when building a feature that calls an external SaaS API, generating a client,
   route handler, or webhook handler, adding a connection to an app, or debugging an integration
-  that returns 400/401/422. Uses One's read tools (search + knowledge) and then writes code; does
-  not execute live calls.
+  that returns 400/401/422. Uses One's read tools (list + find_one_actions) and then writes code;
+  does not execute live calls.
 license: MIT
 allowed-tools:
   - mcp__plugin_one_one__list_one_integrations
-  - mcp__plugin_one_one__search_one_platform_actions
-  - mcp__plugin_one_one__get_one_action_knowledge
+  - mcp__plugin_one_one__find_one_actions
 ---
 
 # Writing integration code with real API schemas
 
 Integration code fails on details a model can't recall: the exact field name, whether a value
 goes in the body or the query string, which enum the API accepts *this year*. One's action
-knowledge carries all of it, so look the API up rather than writing from memory.
+documentation carries all of it, so look the API up rather than writing from memory.
 
 This is what One's **knowledge-only mode** is for: on the consent screen the user can drop
 `execute_one_action`, so you can read every API's real schema while coding and can't fire a
@@ -29,30 +28,33 @@ just never call execute when the deliverable is code.
 
 1. `list_one_integrations`: confirm the platform slug (and, if you're going to run through One,
    grab the connection `key`).
-2. `search_one_platform_actions` on that `platform`, `query` described by outcome ("create a
-   customer", "list orders since a date"). Pass `agent_type: "knowledge"` if you want to bias
-   toward documentation-rich results.
-3. `get_one_action_knowledge` with `action_id` + `platform` for the action you picked. Read
-   the whole thing: required and optional parameters, types, enums, auth, the request shape,
-   the response shape, and the gotchas section.
+2. `find_one_actions` with one `requests` entry per operation the feature needs, on any
+   platforms: `platform` plus an `intent` naming the operation alone ("create a customer",
+   "list orders since a date"), and optionally a `task` describing the feature in general terms.
+   One call covers every API the feature touches.
+3. Read each chosen action's documentation: required and optional parameters, types, enums,
+   auth, the request shape, the response shape, and the gotchas section. In knowledge-only mode
+   it comes back whole with how to call it from code; otherwise large documents come back as a
+   digest, so call `find_one_actions` again with `load: [{ "action_id": "...", "full": true }]`
+   for the whole document before generating types from it.
 4. Write the code **from that schema**. Field names, casing, nesting, and types come from the
-   knowledge, not from what the API probably looks like.
+   documentation, not from what the API probably looks like.
 
-If you write a request body with a field the knowledge doesn't list, you invented it. Go back
+If you write a request body with a field the documentation doesn't list, you invented it. Go back
 and check.
 
 ## Two ways to ship the call: pick one and say which
 
 **Through One (Passthrough API).** Keep One in the runtime. The user's One connection handles
 the platform's auth, so your code holds no per-platform tokens and no refresh logic. In
-knowledge-only mode the knowledge response ends with an *Integration Code Guide* that spells
-this out: `POST/GET https://api.withone.ai/v1/passthrough<action path>` with headers
+knowledge-only mode each action `find_one_actions` returns comes with *Calling this action from
+code*, and the answer ends with an *Integration Code Guide*, which spell this out: `POST/GET https://api.withone.ai/v1/passthrough<action path>` with headers
 `x-one-secret` (from `ONE_SECRET`), `x-one-connection-key` (from an env var like
 `ONE_GMAIL_CONNECTION_KEY`), and `x-one-action-id` (the action's id). Follow that guide
 verbatim: path variables into the URL, query params into the query string, body fields into
 JSON. Good when the app already uses One or integrates several platforms.
 
-**Direct to the platform.** Use the knowledge purely as documentation and write a normal HTTP
+**Direct to the platform.** Use One's documentation purely as a reference and write a normal HTTP
 client against the vendor's own base URL. You then own OAuth, token refresh, and rotation. Good
 when the integration is one platform deep or the runtime can't take another dependency.
 
@@ -61,7 +63,7 @@ the same module.
 
 ## Types come from the response shape
 
-The knowledge includes the response shape. Generate types from it instead of hand-writing an
+The documentation includes the response shape. Generate types from it instead of hand-writing an
 interface that drifts. Model optional fields as optional. When the API returns a union or a
 nullable field, represent that rather than asserting the happy path.
 
@@ -76,7 +78,7 @@ Supabase secrets, and so on).
 
 ## Pagination and rate limits are not optional
 
-The knowledge names the pagination parameters and the platform's limits. A list call that
+The documentation names the pagination parameters and the platform's limits. A list call that
 ignores them works on a test account with twelve records and fails on a real one. Write the
 loop with a cursor and a bound, and handle 429 with a backoff in the first version, not the
 second.
@@ -96,7 +98,8 @@ unverified webhook endpoint is an open write path into your system.
 
 ## Debugging an integration that's already broken
 
-Re-read the knowledge for the action before changing anything. Most 400s are a renamed field or
+Re-read the action's documentation (`find_one_actions` with `load` and its `action_id`) before
+changing anything. Most 400s are a renamed field or
 a value in the wrong place. Compare the failing request against the schema field by field. If
 auth is failing, check the scope granted on the connection before touching the code.
 
