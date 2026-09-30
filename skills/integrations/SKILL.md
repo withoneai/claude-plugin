@@ -6,29 +6,27 @@ description: >-
   server. Use whenever the user wants to send an email, post a message, look up a customer, pull
   invoices, create or update a record (order, contact, task, issue, deal), or take ANY action in an
   external or connected SaaS app, even if they never say "One". Workflow: list_one_integrations,
-  then search_one_platform_actions, then get_one_action_knowledge, then execute_one_action. Never
-  execute without reading the knowledge first.
+  then find_one_actions (every operation the task needs, in one call, with each action's
+  documentation), then execute_one_action. Never execute without reading the documentation first.
 license: MIT
 allowed-tools:
   - mcp__plugin_one_one__list_one_integrations
-  - mcp__plugin_one_one__search_one_platform_actions
-  - mcp__plugin_one_one__get_one_action_knowledge
+  - mcp__plugin_one_one__find_one_actions
 ---
 
 # Working with third-party apps through One
 
-One exposes every app the user has connected through **four tools**. No matter how many apps
-or actions they connect, it stays four tools, so *search* is how you find things, not a giant
-tool list.
+One exposes every app the user has connected through **three tools**. No matter how many apps
+or actions they connect, it stays three tools, so *finding* is how you get to an action, not a
+giant tool list.
 
 | Tool | What it does |
 | --- | --- |
 | `list_one_integrations` | Lists the user's active connections, each with its `key` and the `access` it allows |
-| `search_one_platform_actions` | Searches the action catalog of one platform |
-| `get_one_action_knowledge` | Returns the real documentation for one action: parameters, types, request shape, gotchas |
+| `find_one_actions` | Finds the action for every operation a task needs, across platforms, with its real documentation: parameters, types, request shape, gotchas |
 | `execute_one_action` | Runs the action against the live account |
 
-**Golden rule: never guess an action's parameters. Always read its knowledge first.**
+**Golden rule: never guess an action's parameters. Always read its documentation first.**
 
 ## The loop
 
@@ -51,31 +49,51 @@ If the platform is missing, the user hasn't connected it. Say which platform and
 https://app.withone.ai to add it. Do **not** fall back to a raw HTTP request, a scraped page, or
 a different platform that happens to be connected.
 
-### 2. `search_one_platform_actions`: find the action
+### 2. `find_one_actions`: find every action the task needs, with its documentation
 
-Input: `platform` (the slug from step 1), `query` (plain language describing the *outcome*:
-"send an email", "list paid invoices", "create a customer"), and optional `agent_type`
-(`"execute"` when the user wants to *perform* something, `"knowledge"` when they want to
-read/learn/generate code; omit to search all). Returns up to 5 candidates, each with an
-`actionId`, `title`, HTTP `method`, and `path`. Pick the best match. If nothing fits, rephrase
-by outcome or re-check the platform slug.
+Send **one call for the whole task**, one `requests` entry per operation, on any platforms:
 
-Skip this step for **action-scoped** connections. Their `access.actions` list already names
-exactly what may run.
+```json
+{
+  "task": "email a weather report to a contact",
+  "requests": [
+    { "platform": "wttr-in", "intent": "get the weather for a city" },
+    { "platform": "gmail", "intent": "send an email" }
+  ]
+}
+```
 
-### 3. `get_one_action_knowledge`: MANDATORY before executing
+- `intent` names the **operation alone**, in a few words: "send a message to a channel", not
+  "post 'deploy done' in #eng". IDs, names and message text in the intent make the search miss.
+- `task` (optional) is the whole job in one line, **in general terms**: what it does, without
+  names, addresses, IDs or message text. It helps choose between similar actions.
+- `platform` is the slug from step 1. Up to 10 requests per call.
 
-Input: `action_id` and `platform`. Returns the full action doc: required and optional
-parameters, exact names and casing, enums, where each value belongs (path / query / body /
-header), the response shape, and platform-specific gotchas. **Always call this before
-`execute_one_action`**, for the *specific* `action_id` you're about to run.
+For each intent the answer says why it chose what it did, then gives:
 
-> The knowledge text ends with a "How to execute this action" block written in camelCase
-> (`actionId`, `connectionKey`, `pathVariables`, `queryParams`, `platform`). That block describes
-> the *concepts*; the actual tool parameters are the snake_case names in the next step. Follow the
-> tool schema.
+- **The action to use**, headed `Title · METHOD path · actionId: ...`, with its documentation:
+  required and optional parameters, exact names and casing, enums, where each value belongs
+  (path / query / body / header), the response shape, and gotchas. Large documents come back as
+  a digest that names what it left out.
+- Sometimes **actions also chosen**: needed beside the pick for the same intent (look up, then
+  update). Use them together.
+- Sometimes **"use this one instead: one or the other, never both"**: a substitute for when the
+  pick doesn't fit. Never run both.
+- **Alternatives**, one line each, undocumented.
 
-### 4. `execute_one_action`: perform the operation
+If it says **no action fits**, rephrase the intent by outcome or check the platform slug. If it
+says the chosen action **is not allowed**, the user's access settings refused it and it offered
+the next allowed one; check it fits.
+
+**Need more of a document?** Call `find_one_actions` again with `load` instead of `requests`:
+`load: [{ "action_id": "...", "section": "Response" }]` for a section the digest left out (the
+digest names the exact call), `"full": true` for the whole document, `"toc": true` for its
+contents, or just the `action_id` of an alternative for its documentation.
+
+For **action-scoped** connections, `access.actions` already names exactly what may run: read
+the one you need with `load: [{ "action_id": "..." }]` instead of sending `requests`.
+
+### 3. `execute_one_action`: perform the operation
 
 Parameters (snake_case; these are the real names on the tool):
 
@@ -91,7 +109,7 @@ Parameters (snake_case; these are the real names on the tool):
 | `is_form_data` | no | Not supported yet. Leave unset |
 
 There is no `platform` parameter on execute; the connection key already identifies it. Put
-values where the knowledge says they go: path variables in `path_variables`, query params in
+values where the documentation says they go: path variables in `path_variables`, query params in
 `query_params`, body fields in `data`. Don't hand-build URLs or stuff path values into the body.
 
 This makes a **live call** to the real platform, so Claude Code asks the user to approve it.
@@ -105,16 +123,17 @@ Each connection's `access` tells you exactly what you may run:
 - `{"policy": "methods", "methods": ["GET"]}`: only those HTTP methods (`["GET"]` = read-only).
   Plan a read-only answer and say so, rather than attempting a write that will be refused.
 - `{"policy": "actions", "actions": [{"actionId", "title", "method"}, ...]}`: exactly those
-  actions. Use one of them directly; no need to search.
+  actions. Use one of them directly; `find_one_actions` with `load` gets its documentation.
 
 If `execute_one_action` isn't in your tool list at all, the user chose **knowledge-only mode**
-on the One consent screen. You can list, search, and read documentation, but not perform live
-operations. Switch to writing code (see the `integration-code` skill) or tell the user they
+on the One consent screen. You can list and find actions with their documentation, but not perform
+live operations: `find_one_actions` then returns each action's whole document with how to call it
+from code. Switch to writing code (see the `integration-code` skill) or tell the user they
 need to re-authorize with execution enabled (`/mcp`, One, Clear authentication, sign in again).
 
 ## Never guess parameters
 
-The knowledge returns the actual schema: required fields, exact names, types, enum values, and
+The documentation returns the actual schema: required fields, exact names, types, enum values, and
 where each value belongs. Guessing a field name that looks obvious produces a 400 from the
 platform, or worse, a 200 that wrote the wrong thing.
 
@@ -133,15 +152,15 @@ not permission to update it.
 
 ## Branch: doing vs building
 
-- **Doing** ("send the email", "create the order", "post to Slack"): run all four steps.
+- **Doing** ("send the email", "create the order", "post to Slack"): run all three steps.
 - **Building** ("write a script that syncs Shopify orders", "add a Stripe webhook handler"):
-  run steps 1 to 3, then **stop and write code** from the returned knowledge. Don't call
+  run steps 1 and 2, then **stop and write code** from the returned documentation. Don't call
   `execute_one_action`; the user wants source, not a live call. The `integration-code` skill
   covers this in depth.
 
 ## Pagination
 
-List actions are paginated. The knowledge names the parameters (`limit`, `cursor`, `page`,
+List actions are paginated. The documentation names the parameters (`limit`, `cursor`, `page`,
 `starting_after`, `pageToken`; it varies by platform). Fetch a bounded page, summarize it, and
 tell the user it was a page rather than everything. Don't page a whole account into context.
 
@@ -149,8 +168,8 @@ tell the user it was a page rather than everything. Don't page a whole account i
 
 The error comes from the platform, not from One. Read it.
 
-- **400 / 422**: your parameters don't match the schema. Re-read the knowledge, fix the field,
-  retry once.
+- **400 / 422**: your parameters don't match the schema. Re-read the documentation (`load` the
+  section if the digest left it out), fix the field, retry once.
 - **401 / 403**: the connection lacks permission or needs re-authorizing on One's side. Tell the
   user which platform and stop; retrying won't help.
 - **404**: the id doesn't exist on that account. Verify with a read before assuming the action
@@ -164,7 +183,8 @@ first attempt may have succeeded.
 
 ## Multiple platforms in one task
 
-Chain reads before writes. Pull from every source first, reconcile, then write once per target.
+Find every action in one `find_one_actions` call, then chain reads before writes. Pull from every
+source first, reconcile, then write once per target.
 A per-record read-then-write loop across two platforms is slow and leaves half-finished state
 when it breaks.
 

@@ -4,14 +4,14 @@ Connect Claude Code and Claude Cowork to **700+ apps** (Gmail, Slack, Shopify, H
 Salesforce, QuickBooks, Google Calendar, and more) through [One](https://www.withone.ai)'s
 [remote MCP server](https://www.withone.ai/products/mcp).
 
-Four tools. Real API documentation for 80,000+ actions. OAuth sign-in in your browser. Nothing to
+Three tools. Real API documentation for 80,000+ actions. OAuth sign-in in your browser. Nothing to
 install and no API keys to manage: One handles every platform's auth server-side.
 
 Learn more about the server this plugin connects to: **https://www.withone.ai/products/mcp**
 
 ```text
-Discover -> Search -> Read the docs -> Execute
-list_one_integrations -> search_one_platform_actions -> get_one_action_knowledge -> execute_one_action
+Discover -> Find every action, with its docs -> Execute
+list_one_integrations -> find_one_actions -> execute_one_action
 ```
 
 ## What you can do
@@ -70,15 +70,14 @@ don't have to name tools:
 | `/one:integration-code` | Writing code that calls a third-party API, using the real schema instead of a guessed one. |
 
 `execute_one_action` performs a **live** call (sending email, creating records, and so on), so
-Claude Code asks you to approve it. The three discovery tools are read-only.
+Claude Code asks you to approve it. The two discovery tools are read-only.
 
 ## Tools
 
 | Tool | What it does |
 | --- | --- |
 | `list_one_integrations` | Your connected accounts, each with its connection `key` and the `access` it allows. |
-| `search_one_platform_actions` | Find actions on a platform from a natural-language query. |
-| `get_one_action_knowledge` | An action's full documentation: parameters, types, request/response shape, gotchas. |
+| `find_one_actions` | Finds the action for every operation a task needs, across platforms, in one call, with its full documentation: parameters, types, request/response shape, gotchas. `load` fetches a section, the whole document, or an alternative's. |
 | `execute_one_action` | Perform the live API call through One. |
 
 Tool names inside Claude Code are prefixed `mcp__plugin_one_one__` (for example
@@ -114,7 +113,7 @@ your browser. Nothing runs locally.
   Connect it at [app.withone.ai](https://app.withone.ai), or re-authenticate to widen the scope.
 - **"Missing required OAuth scope"**: re-authenticate via `/mcp`.
 - **You also use the One connector on claude.ai**: Claude Code deduplicates servers by endpoint, so
-  a session shows either `plugin:one:one` or `claude.ai One` (same server, same four tools). If the
+  a session shows either `plugin:one:one` or `claude.ai One` (same server, same three tools). If the
   connector wins, tool names appear as `mcp__claude_ai_One__*` instead. Everything else is identical.
 - **Working on this repo itself**: its `.mcp.json` doubles as a project-scoped server when you open
   Claude Code here. Add `"disabledMcpjsonServers": ["one"]` to `.claude/settings.local.json` to avoid
